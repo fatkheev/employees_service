@@ -11,14 +11,14 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
 
-  # app:
-  #   build: .
-  #   ports:
-  #     - "8080:8080"
-  #   depends_on:
-  #     - db
-  #   env_file:
-  #     - .env
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    env_file:
+      - .env
 
 volumes:
   db_data:
