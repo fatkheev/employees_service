@@ -1,0 +1,5 @@
+FROM swaggerapi/swagger-ui
+
+ENV SWAGGER_JSON=/swagger/swagger.yaml
+
+COPY ./swagger.yaml /swagger/

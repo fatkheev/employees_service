@@ -3,13 +3,23 @@ services:
   db:
     image: postgres:13
     environment:
-      POSTGRES_DB: employees_db
+      POSTGRES_DB: postgres
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
     ports:
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
+
+  swagger:
+    build:
+      context: .
+      dockerfile: Dockerfile.swagger
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./swagger.yaml:/swagger/swagger.yaml
+      - .:/app
 
   app:
     build: .

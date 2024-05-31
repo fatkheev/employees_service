@@ -54,3 +54,7 @@ func InitDB() {
 
     log.Printf("Connected to database: %s, schema: %s", dbName, schemaName)
 }
+
+func SetDB(mockDB *sql.DB) {
+    DB = mockDB
+}

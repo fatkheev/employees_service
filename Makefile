@@ -1,4 +1,4 @@
-.PHONY: up down build run help
+.PHONY: up down build run help migrate-up migrate-down clear
 
 up: ## Запускает docker-compose
 	@docker-compose up --build
@@ -11,6 +11,15 @@ build: ## Собирает образ приложения
 
 run: ## Запускает приложение локально
 	@go run main.go
+
+migrate-up:
+	goose -dir ./db/migrations postgres "host=db user=user password=password dbname=postgres sslmode=disable" up
+
+migrate-down:
+	goose -dir ./db/migrations postgres "host=db user=user password=password dbname=postgres sslmode=disable" down
+
+clear:
+	goose -dir ./db/migrations postgres "host=db user=user password=password dbname=postgres sslmode=disable" up-to 2023053102
 
 help: ## Выводит помощь по использованию make
 	@echo "Использование:"
