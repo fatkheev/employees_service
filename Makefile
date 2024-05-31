@@ -1,3 +1,9 @@
+DB_HOST := localhost
+DB_PORT := 5432
+DB_USER := user
+DB_PASSWORD := password
+DB_NAME := postgres
+
 .PHONY: up down build run help migrate-up migrate-down clear
 
 up: ## Запускает docker-compose
@@ -12,14 +18,13 @@ build: ## Собирает образ приложения
 run: ## Запускает приложение локально
 	@go run main.go
 
+DB_URL=postgres://user:password@localhost:5432/postgres?sslmode=disable
+
 migrate-up:
-	goose -dir ./db/migrations postgres "host=db user=user password=password dbname=postgres sslmode=disable" up
+	@PGPASSWORD=$(DB_PASSWORD) psql -h $(DB_HOST) -U $(DB_USER) -d $(DB_NAME) -f create_tables.sql
 
 migrate-down:
-	goose -dir ./db/migrations postgres "host=db user=user password=password dbname=postgres sslmode=disable" down
-
-clear:
-	goose -dir ./db/migrations postgres "host=db user=user password=password dbname=postgres sslmode=disable" up-to 2023053102
+	@PGPASSWORD=$(DB_PASSWORD) psql -h $(DB_HOST) -U $(DB_USER) -d $(DB_NAME) -f drop_tables.sql
 
 help: ## Выводит помощь по использованию make
 	@echo "Использование:"

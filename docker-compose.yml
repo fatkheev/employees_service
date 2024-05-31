@@ -19,7 +19,6 @@ services:
       - "8081:8080"
     volumes:
       - ./swagger.yaml:/swagger/swagger.yaml
-      - .:/app
 
   app:
     build: .
@@ -29,6 +28,8 @@ services:
       - db
     env_file:
       - .env
+    volumes:
+      - .:/app
 
 volumes:
   db_data:
