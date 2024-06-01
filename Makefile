@@ -3,8 +3,15 @@ MIGRATE=migrate -path ./docs/migrations -database "postgres://$(DB_USER):$(DB_PA
 
 .PHONY: up down build run help migrate-up migrate-down clear
 
-up: ## Запускает docker-compose
-	@docker-compose up --build
+up: up-db up-app ## Запускает docker-compose
+
+up-db: ## Запускает docker-compose для базы данных
+	@docker-compose up -d db
+
+up-app: ## Ждет готовности базы данных и запускает остальные контейнеры
+	@echo "Ожидание запуска базы данных..."
+	@sleep 10 # Задержка в 10 секунд для ожидания готовности базы данных
+	@docker-compose up --build swagger app
 
 down: ## Останавливает и удаляет контейнеры
 	@docker-compose down
