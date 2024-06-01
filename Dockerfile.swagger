@@ -1,5 +1,7 @@
 FROM swaggerapi/swagger-ui
 
+COPY ./swagger.yaml /swagger/swagger.yaml
+
 ENV SWAGGER_JSON=/swagger/swagger.yaml
 
-COPY ./swagger.yaml /swagger/
+EXPOSE 8080

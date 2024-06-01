@@ -18,7 +18,7 @@ func TestCreateEmployee(t *testing.T) {
     // Создаем мок базы данных
     mockDB, mock, err := sqlmock.New()
     if err != nil {
-        t.Fatalf("An error '%s' was not expected when opening a stub database connection", err)
+        t.Fatalf("Ошибка при открытии соединения с мок базой данных: %s", err)
     }
     defer mockDB.Close()
 
@@ -38,7 +38,7 @@ func TestCreateEmployee(t *testing.T) {
 
     // Инициализируем базу данных, чтобы установить search_path
     if _, err := mockDB.Exec("SET search_path TO new_schema"); err != nil {
-        t.Fatalf("failed to set search_path: %s", err)
+        t.Fatalf("Ошибка при установке search_path: %s", err)
     }
 
     // Создание запроса
@@ -56,7 +56,7 @@ func TestCreateEmployee(t *testing.T) {
     body, _ := json.Marshal(employee)
     req, err := http.NewRequest("POST", "/employees", bytes.NewBuffer(body))
     if err != nil {
-        t.Fatal(err)
+        t.Fatalf("Ошибка при создании запроса: %s", err)
     }
     req.Header.Set("Content-Type", "application/json")
 
@@ -68,25 +68,25 @@ func TestCreateEmployee(t *testing.T) {
     handler.ServeHTTP(rr, req)
 
     // Проверка статуса ответа
-    assert.Equal(t, http.StatusCreated, rr.Code, "Expected status code 201")
+    assert.Equal(t, http.StatusCreated, rr.Code, "Ожидался статус 201")
 
     // Проверка тела ответа
     var response map[string]interface{}
     err = json.NewDecoder(rr.Body).Decode(&response)
     if err != nil {
-        t.Fatalf("Failed to decode response body: %s", err)
+        t.Fatalf("Ошибка при декодировании тела ответа: %s", err)
     }
 
     id, ok := response["id"].(float64)
     if !ok {
-        t.Fatalf("Expected ID to be a number but got %T", response["id"])
+        t.Fatalf("Ожидался ID как число, но получен %T", response["id"])
     }
 
-    assert.Greater(t, int(id), 0, "ID should be greater than 0")
+    assert.Greater(t, int(id), 0, "ID должен быть больше 0")
 
     // Проверка ожиданий моков
     if err := mock.ExpectationsWereMet(); err != nil {
-        t.Errorf("there were unfulfilled expectations: %s", err)
+        t.Errorf("Не выполнены ожидания: %s", err)
     }
 }
 
@@ -94,7 +94,7 @@ func TestDeleteEmployee(t *testing.T) {
     // Создаем мок базы данных
     mockDB, mock, err := sqlmock.New()
     if err != nil {
-        t.Fatalf("An error '%s' was not expected when opening a stub database connection", err)
+        t.Fatalf("Ошибка при открытии соединения с мок базой данных: %s", err)
     }
     defer mockDB.Close()
 
@@ -110,13 +110,13 @@ func TestDeleteEmployee(t *testing.T) {
 
     // Инициализируем базу данных, чтобы установить search_path
     if _, err := mockDB.Exec("SET search_path TO new_schema"); err != nil {
-        t.Fatalf("failed to set search_path: %s", err)
+        t.Fatalf("Ошибка при установке search_path: %s", err)
     }
 
     // Создание запроса
     req, err := http.NewRequest("DELETE", "/employees/1", nil)
     if err != nil {
-        t.Fatal(err)
+        t.Fatalf("Ошибка при создании запроса: %s", err)
     }
 
     // Создание ResponseRecorder для захвата ответа
@@ -128,11 +128,11 @@ func TestDeleteEmployee(t *testing.T) {
     router.ServeHTTP(rr, req)
 
     // Проверка статуса ответа
-    assert.Equal(t, http.StatusNoContent, rr.Code, "Expected status code 204")
+    assert.Equal(t, http.StatusNoContent, rr.Code, "Ожидался статус 204")
 
     // Проверка ожиданий моков
     if err := mock.ExpectationsWereMet(); err != nil {
-        t.Errorf("there were unfulfilled expectations: %s", err)
+        t.Errorf("Не выполнены ожидания: %s", err)
     }
 }
 
@@ -140,7 +140,7 @@ func TestGetEmployeesByCompany(t *testing.T) {
     // Создаем мок базы данных
     mockDB, mock, err := sqlmock.New()
     if err != nil {
-        t.Fatalf("An error '%s' was not expected when opening a stub database connection", err)
+        t.Fatalf("Ошибка при открытии соединения с мок базой данных: %s", err)
     }
     defer mockDB.Close()
 
@@ -157,7 +157,7 @@ func TestGetEmployeesByCompany(t *testing.T) {
     // Создание запроса
     req, err := http.NewRequest("GET", "/companies/1/employees", nil)
     if err != nil {
-        t.Fatal(err)
+        t.Fatalf("Ошибка при создании запроса: %s", err)
     }
 
     // Создание ResponseRecorder для захвата ответа
@@ -167,24 +167,24 @@ func TestGetEmployeesByCompany(t *testing.T) {
     router.ServeHTTP(rr, req)
 
     // Проверка статуса ответа
-    assert.Equal(t, http.StatusOK, rr.Code, "Expected status code 200")
+    assert.Equal(t, http.StatusOK, rr.Code, "Ожидался статус 200")
 
     // Проверка тела ответа
     var employees []models.Employee
     err = json.NewDecoder(rr.Body).Decode(&employees)
     if err != nil {
-        t.Fatalf("Failed to decode response body: %s", err)
+        t.Fatalf("Ошибка при декодировании тела ответа: %s", err)
     }
 
-    assert.Len(t, employees, 1, "Expected one employee")
-    assert.Equal(t, "John", employees[0].Name, "Expected employee name to be 'John'")
+    assert.Len(t, employees, 1, "Ожидался один сотрудник")
+    assert.Equal(t, "John", employees[0].Name, "Ожидалось имя сотрудника 'John'")
 }
 
 func TestGetEmployeesByDepartment(t *testing.T) {
     // Создаем мок базы данных
     mockDB, mock, err := sqlmock.New()
     if err != nil {
-        t.Fatalf("An error '%s' was not expected when opening a stub database connection", err)
+        t.Fatalf("Ошибка при открытии соединения с мок базой данных: %s", err)
     }
     defer mockDB.Close()
 
@@ -201,7 +201,7 @@ func TestGetEmployeesByDepartment(t *testing.T) {
     // Создание запроса
     req, err := http.NewRequest("GET", "/departments/1/employees", nil)
     if err != nil {
-        t.Fatal(err)
+        t.Fatalf("Ошибка при создании запроса: %s", err)
     }
 
     // Создание ResponseRecorder для захвата ответа
@@ -211,70 +211,70 @@ func TestGetEmployeesByDepartment(t *testing.T) {
     router.ServeHTTP(rr, req)
 
     // Проверка статуса ответа
-    assert.Equal(t, http.StatusOK, rr.Code, "Expected status code 200")
+    assert.Equal(t, http.StatusOK, rr.Code, "Ожидался статус 200")
 
     // Проверка тела ответа
     var employees []models.Employee
     err = json.NewDecoder(rr.Body).Decode(&employees)
     if err != nil {
-        t.Fatalf("Failed to decode response body: %s", err)
+        t.Fatalf("Ошибка при декодировании тела ответа: %s", err)
     }
 
-    assert.Len(t, employees, 1, "Expected one employee")
-    assert.Equal(t, "John", employees[0].Name, "Expected employee name to be 'John'")
+    assert.Len(t, employees, 1, "Ожидался один сотрудник")
+    assert.Equal(t, "John", employees[0].Name, "Ожидалось имя сотрудника 'John'")
 }
 
 func TestUpdateEmployee(t *testing.T) {
-	// Создаем мок базы данных
-	mockDB, mock, err := sqlmock.New()
-	if err != nil {
-		 t.Fatalf("An error '%s' was not expected when opening a stub database connection", err)
-	}
-	defer mockDB.Close()
+    // Создаем мок базы данных
+    mockDB, mock, err := sqlmock.New()
+    if err != nil {
+        t.Fatalf("Ошибка при открытии соединения с мок базой данных: %s", err)
+    }
+    defer mockDB.Close()
 
-	db.SetDB(mockDB) // Используем мок базы данных
+    db.SetDB(mockDB) // Используем мок базы данных
 
-	// Настройка ожидаемых запросов и их результатов
-	mock.ExpectExec("SET search_path TO new_schema").
-		 WillReturnResult(sqlmock.NewResult(1, 1))
+    // Настройка ожидаемых запросов и их результатов
+    mock.ExpectExec("SET search_path TO new_schema").
+        WillReturnResult(sqlmock.NewResult(1, 1))
 
-	mock.ExpectExec("UPDATE new_schema.employees SET name = \\$1, surname = \\$2, phone = \\$3, company_id = \\$4, department_id = \\$5 WHERE id = \\$6").
-		 WithArgs("John", "Doe", "123456789", 1, 1, 1).
-		 WillReturnResult(sqlmock.NewResult(1, 1))
+    mock.ExpectExec("UPDATE new_schema.employees SET name = \\$1, surname = \\$2, phone = \\$3, company_id = \\$4, department_id = \\$5 WHERE id = \\$6").
+        WithArgs("John", "Doe", "123456789", 1, 1, 1).
+        WillReturnResult(sqlmock.NewResult(1, 1))
 
-	// Инициализируем базу данных, чтобы установить search_path
-	if _, err := mockDB.Exec("SET search_path TO new_schema"); err != nil {
-		 t.Fatalf("failed to set search_path: %s", err)
-	}
+    // Инициализируем базу данных, чтобы установить search_path
+    if _, err := mockDB.Exec("SET search_path TO new_schema"); err != nil {
+        t.Fatalf("Ошибка при установке search_path: %s", err)
+    }
 
-	// Создание запроса
-	employee := models.Employee{
-		 Name:         "John",
-		 Surname:      "Doe",
-		 Phone:        "123456789",
-		 CompanyID:    1,
-		 DepartmentID: 1,
-	}
-	body, _ := json.Marshal(employee)
-	req, err := http.NewRequest("PUT", "/employees/1", bytes.NewBuffer(body))
-	if err != nil {
-		 t.Fatal(err)
-	}
-	req.Header.Set("Content-Type", "application/json")
+    // Создание запроса
+    employee := models.Employee{
+        Name:         "John",
+        Surname:      "Doe",
+        Phone:        "123456789",
+        CompanyID:    1,
+        DepartmentID: 1,
+    }
+    body, _ := json.Marshal(employee)
+    req, err := http.NewRequest("PUT", "/employees/1", bytes.NewBuffer(body))
+    if err != nil {
+        t.Fatalf("Ошибка при создании запроса: %s", err)
+    }
+    req.Header.Set("Content-Type", "application/json")
 
-	// Создание ResponseRecorder для захвата ответа
-	rr := httptest.NewRecorder()
-	router := mux.NewRouter()
-	router.HandleFunc("/employees/{id}", UpdateEmployee).Methods("PUT")
+    // Создание ResponseRecorder для захвата ответа
+    rr := httptest.NewRecorder()
+    router := mux.NewRouter()
+    router.HandleFunc("/employees/{id}", UpdateEmployee).Methods("PUT")
 
-	// Вызов обработчика
-	router.ServeHTTP(rr, req)
+    // Вызов обработчика
+    router.ServeHTTP(rr, req)
 
-	// Проверка статуса ответа
-	assert.Equal(t, http.StatusNoContent, rr.Code, "Expected status code 204")
+    // Проверка статуса ответа
+    assert.Equal(t, http.StatusNoContent, rr.Code, "Ожидался статус 204")
 
-	// Проверка ожиданий моков
-	if err := mock.ExpectationsWereMet(); err != nil {
-		 t.Errorf("there were unfulfilled expectations: %s", err)
-	}
+    // Проверка ожиданий моков
+    if err := mock.ExpectationsWereMet(); err != nil {
+        t.Errorf("Не выполнены ожидания: %s", err)
+    }
 }

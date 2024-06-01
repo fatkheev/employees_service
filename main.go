@@ -16,7 +16,7 @@ func main() {
     // Загрузка переменных окружения из .env файла
     err := godotenv.Load()
     if err != nil {
-        log.Fatal("Error loading .env file")
+        log.Fatal("Ошибка при загрузке файла .env")
     }
 
     // Логирование загруженных переменных окружения
@@ -40,6 +40,6 @@ func main() {
         AllowCredentials: true,
     })
 
-    log.Println("Server is running on port 8080")
+    log.Println("Сервер запущен на порту 8080")
     log.Fatal(http.ListenAndServe(":8080", c.Handler(r)))
 }

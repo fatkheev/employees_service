@@ -7,7 +7,7 @@ servers:
 paths:
   /employees:
     post:
-      summary: Create an employee
+      summary: Создание сотрудника
       requestBody:
         required: true
         content:
@@ -34,7 +34,7 @@ paths:
                   department_id: 1
       responses:
         '201':
-          description: Employee created successfully
+          description: Сотрудник успешно создан
           content:
             application/json:
               schema:
@@ -44,7 +44,7 @@ paths:
                     type: integer
   /employees/{id}:
     delete:
-      summary: Delete an employee by ID
+      summary: Удаление сотрудника по ID
       parameters:
         - name: id
           in: path
@@ -55,7 +55,7 @@ paths:
         '204':
           description: Employee deleted successfully
     put:
-      summary: Update an employee by ID
+      summary: Обновление данных о сутруднике по ID
       parameters:
         - name: id
           in: path
@@ -78,10 +78,10 @@ paths:
                   department_id: 1
       responses:
         '204':
-          description: Employee updated successfully
+          description: Данные сотрудника обновлены
   /companies/{company_id}/employees:
     get:
-      summary: Get employees by company ID
+      summary: Получение списка сотрудников по ID компании
       parameters:
         - name: company_id
           in: path
@@ -90,7 +90,7 @@ paths:
             type: integer
       responses:
         '200':
-          description: A list of employees
+          description: Список сотрудников
           content:
             application/json:
               schema:
@@ -99,7 +99,7 @@ paths:
                   $ref: '#/components/schemas/Employee'
   /departments/{department_id}/employees:
     get:
-      summary: Get employees by department ID
+      summary: Получение списка сотрудников по ID отдела
       parameters:
         - name: department_id
           in: path
@@ -108,7 +108,7 @@ paths:
             type: integer
       responses:
         '200':
-          description: A list of employees
+          description: Список сотрудников
           content:
             application/json:
               schema:
