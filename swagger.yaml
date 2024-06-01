@@ -15,7 +15,17 @@ paths:
             schema:
               $ref: '#/components/schemas/Employee'
             examples:
-              Employee:
+              EmployeeWithPassport:
+                value:
+                  name: "John"
+                  surname: "Doe"
+                  phone: "123456789"
+                  company_id: 1
+                  department_id: 1
+                  passport:
+                    type: "Passport"
+                    number: "A12345678"
+              EmployeeWithoutPassport:
                 value:
                   name: "John"
                   surname: "Doe"
@@ -129,10 +139,9 @@ components:
               type: string
             number:
               type: string
-        department:
-          type: object
-          properties:
-            name:
-              type: string
-            phone:
-              type: string
+      required:
+        - name
+        - surname
+        - phone
+        - company_id
+        - department_id

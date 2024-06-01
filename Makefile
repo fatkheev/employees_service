@@ -1,8 +1,5 @@
-DB_HOST := localhost
-DB_PORT := 5432
-DB_USER := user
-DB_PASSWORD := password
-DB_NAME := postgres
+include .env
+MIGRATE=migrate -path ./docs/migrations -database "postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable"
 
 .PHONY: up down build run help migrate-up migrate-down clear
 
@@ -18,13 +15,21 @@ build: ## Собирает образ приложения
 run: ## Запускает приложение локально
 	@go run main.go
 
-DB_URL=postgres://user:password@localhost:5432/postgres?sslmode=disable
+test: ## Запускает тесты
+	@go test ./handlers -v
 
 migrate-up:
-	@PGPASSWORD=$(DB_PASSWORD) psql -h $(DB_HOST) -U $(DB_USER) -d $(DB_NAME) -f create_tables.sql
+	@echo "Применение миграций..."
+	@$(MIGRATE) down
+	@$(MIGRATE) up
 
 migrate-down:
-	@PGPASSWORD=$(DB_PASSWORD) psql -h $(DB_HOST) -U $(DB_USER) -d $(DB_NAME) -f drop_tables.sql
+	@echo "Откат миграций..."
+	@$(MIGRATE) down
+
+migrate-force:
+	@echo "Принудительный сброс миграций..."
+	@$(MIGRATE) force $(version)
 
 help: ## Выводит помощь по использованию make
 	@echo "Использование:"

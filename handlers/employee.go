@@ -41,17 +41,19 @@ func CreateEmployee(w http.ResponseWriter, r *http.Request) {
     }
 
     // Insert passport information
-    query = `
-        INSERT INTO new_schema.passports (type, number, employee_id)
-        VALUES ($1, $2, $3)
-    `
-    _, err = db.DB.Exec(query,
-        employee.Passport.Type, employee.Passport.Number, id,
-    )
-    if err != nil {
-        log.Println("Error executing query for passport:", err)
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-        return
+    if employee.Passport != nil {
+        query = `
+            INSERT INTO new_schema.passports (type, number, employee_id)
+            VALUES ($1, $2, $3)
+        `
+        _, err = db.DB.Exec(query,
+            employee.Passport.Type, employee.Passport.Number, id,
+        )
+        if err != nil {
+            log.Println("Error executing query for passport:", err)
+            http.Error(w, err.Error(), http.StatusInternalServerError)
+            return
+        }
     }
 
     log.Printf("Successfully created employee with ID: %d", id)
@@ -113,11 +115,11 @@ func GetEmployeesByCompany(w http.ResponseWriter, r *http.Request) {
     log.Printf("Received request to get employees for company ID: %d", companyID)
 
     query := `
-        SELECT e.id, e.name, e.surname, e.phone, e.company_id,
+        SELECT e.id, e.name, e.surname, e.phone, e.company_id, e.department_id,
                p.type, p.number,
                d.name, d.phone
         FROM new_schema.employees e
-        JOIN new_schema.passports p ON e.id = p.employee_id
+        LEFT JOIN new_schema.passports p ON e.id = p.employee_id
         JOIN new_schema.departments d ON e.department_id = d.id
         WHERE e.company_id = $1
     `
@@ -134,15 +136,15 @@ func GetEmployeesByCompany(w http.ResponseWriter, r *http.Request) {
         var employee models.Employee
         var passport models.Passport
         var department models.Department
-        if err := rows.Scan(&employee.ID, &employee.Name, &employee.Surname, &employee.Phone, &employee.CompanyID,
+        if err := rows.Scan(&employee.ID, &employee.Name, &employee.Surname, &employee.Phone, &employee.CompanyID, &employee.DepartmentID,
             &passport.Type, &passport.Number,
             &department.Name, &department.Phone); err != nil {
             log.Println("Error scanning row:", err)
             http.Error(w, err.Error(), http.StatusInternalServerError)
             return
         }
-        employee.Passport = passport
-        employee.Department = department
+        employee.Passport = &passport
+        employee.Department = &department
         employees = append(employees, employee)
     }
 
@@ -170,11 +172,11 @@ func GetEmployeesByDepartment(w http.ResponseWriter, r *http.Request) {
     log.Printf("Received request to get employees for department ID: %d", departmentID)
 
     query := `
-        SELECT e.id, e.name, e.surname, e.phone, e.company_id,
+        SELECT e.id, e.name, e.surname, e.phone, e.company_id, e.department_id,
                p.type, p.number,
                d.name, d.phone
         FROM new_schema.employees e
-        JOIN new_schema.passports p ON e.id = p.employee_id
+        LEFT JOIN new_schema.passports p ON e.id = p.employee_id
         JOIN new_schema.departments d ON e.department_id = d.id
         WHERE e.department_id = $1
     `
@@ -191,15 +193,15 @@ func GetEmployeesByDepartment(w http.ResponseWriter, r *http.Request) {
         var employee models.Employee
         var passport models.Passport
         var department models.Department
-        if err := rows.Scan(&employee.ID, &employee.Name, &employee.Surname, &employee.Phone, &employee.CompanyID,
+        if err := rows.Scan(&employee.ID, &employee.Name, &employee.Surname, &employee.Phone, &employee.CompanyID, &employee.DepartmentID,
             &passport.Type, &passport.Number,
             &department.Name, &department.Phone); err != nil {
             log.Println("Error scanning row:", err)
             http.Error(w, err.Error(), http.StatusInternalServerError)
             return
         }
-        employee.Passport = passport
-        employee.Department = department
+        employee.Passport = &passport
+        employee.Department = &department
         employees = append(employees, employee)
     }
 

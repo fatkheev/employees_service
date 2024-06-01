@@ -17,4 +17,4 @@ RUN go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate
 
 EXPOSE 8080
 
-CMD ["/app/start.sh"]
+CMD [ "/employee-service" ]
